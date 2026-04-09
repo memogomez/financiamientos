@@ -12,29 +12,42 @@
             <span>Inicio</span>
           </a>
         </li>
-        <li class='sidebar-title'>Folios</li>
-        <li class="sidebar-item  has-sub">
+        <li class='sidebar-title'>SOLICITUDES</li>
+        <li class="sidebar-item has-sub">
           <a href="#" class='sidebar-link'>
-            <i data-feather="file-text" width="20"></i> 
-            <span>Folios</span>
+            <i data-feather="clipboard" width="20"></i>
+            <span>Solicitudes</span>
           </a>
           <ul class="submenu">
             <li>
-              <a href="{{ route('folios.create') }}">Crear</a>
+              <a href="{{ route('solicitudes.create') }}">Crear</a>
             </li>
             <li>
-              <a href="{{ route('folios.show') }}">Ver - Folios</a>
+              <a href="{{ route('solicitudes.show') }}">Ver</a>
             </li>
           </ul>
         </li>
+        <li class='sidebar-title'>AREAS</li>
         <li class="sidebar-item has-sub">
-          <a href="#" class="sidebar-link">
-            <i data-feather="archive" width="20"></i>
-            <span>Historico</span>
+          <a href="#" class='sidebar-link'>
+            <i data-feather="grid" width="20"></i>
+            <span>Areas</span>
           </a>
           <ul class="submenu">
             <li>
-              <a href="{{ route('historicos.show') }}">Ver</a>
+              <a href="{{ route('areas.show') }}">Ver</a>
+            </li>
+          </ul>
+        </li>
+        <li class='sidebar-title'>REPORTES</li>
+        <li class="sidebar-item has-sub">
+          <a href="#" class='sidebar-link'>
+            <i data-feather="bar-chart-2" width="20"></i>
+            <span>Reportes</span>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ route('reportes.fechas') }}">Fechas</a>
             </li>
           </ul>
         </li>
