@@ -32,7 +32,7 @@ $(document).ready(function () {
         width: '9%',
         searchable: false,
         render: function (data) {
-          return `<a href="${context}/solicitudes/${data.id}/edit" class="btn btn-sm btn-secondary">Oficios</a>`;
+          return `<a href="${context}/solicitudes/${data.id}/edit?modo=oficios" class="btn btn-sm btn-secondary">Oficios</a>`;
         },
       },
       {
