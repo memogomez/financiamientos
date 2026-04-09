@@ -45,12 +45,13 @@
               @method('put')
               {{-- <input type="text" name="id_solicitante" value="{{ $folio->id_solicitante }}"> --}}
               <h4 class="card-title mt-3 mb-3">Datos Generales</h4>
+              <p class="text-subtitle text-muted">Recuerda que los campos con <strong>*</strong> son obligatorios</p>
               <div class="row">
                 <div class="col-md-6 col-12">
                   <div class="form-group">
                     <label for="ticket">Ticket</label>
                     <input class="form-control" id="ticket" name="ticket" type="text" 
-                    placeholder="Ticket" value="{{ $folio->ticket }}">
+                    value="{{ $folio->ticket }}">
                     @error('ticket')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -58,9 +59,9 @@
                 </div>
                 <div class="col-md-6 col-12">
                   <div class="form-group">
-                    <label for="acronimo">Acrónimo</label>
+                    <label for="acronimo">Acrónimo</label><strong>*</strong>
                     <input class="form-control" id="acronimo" name="acronimo" type="text" 
-                    placeholder="Acrónimo" value="{{ $folio->acronimo }}">
+                    placeholder="Acrónimo" value="{{ $folio->acronimo }}" readonly>
                     @error('acronimo')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -68,9 +69,9 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="hora">Hora</label>
+                    <label for="hora">Hora</label><strong>*</strong>
                     <input class="form-control" id="hora" name="hora" type="text" 
-                    placeholder="0000" value="{{ $folio->hora }}">
+                    placeholder="0000" value="{{ $folio->hora }}" readonly>
                     @error('hora')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -78,9 +79,9 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="dia_mes">Día/Mes</label>
+                    <label for="dia_mes">Día/Mes</label><strong>*</strong>
                     <input class="form-control" id="dia_mes" name="dia_mes" type="text" 
-                    placeholder="0000" value="{{ $folio->dia_mes }}">
+                    placeholder="0000" value="{{ $folio->dia_mes }}" readonly>
                     @error('dia_mes')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -88,9 +89,9 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="anio">Año</label>
+                    <label for="anio">Año</label><strong>*</strong>
                     <input class="form-control" id="anio" name="anio" type="text" 
-                    placeholder="0000" value="{{ $folio->anio }}">
+                    placeholder="0000" value="{{ $folio->anio }}" readonly>
                     @error('anio')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -98,7 +99,7 @@
                 </div>
                 <div class="col-md-12 col-12">
                   <div class="form-group">
-                    <label for="razon">Razón por la que se otorgo el folio, mención de alcance y vigencia del mismo</label>
+                    <label for="razon">Motivo por el que se otorga el folio</label><strong>*</strong>
                     <textarea class="form-control" id="razon" name="razon" cols="30" rows="5">{{ $folio->razon }}</textarea>
                     @error('razon')
                       <span class="text-danger">{{ $message }}</span>
@@ -107,7 +108,7 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="numero_registro">NIC, NUC o Número de registro provicional en su libro de gobierno:</label>
+                    <label for="numero_registro">NIC, NUC o Número de registro provisional en su libro de gobierno:</label><strong>*</strong>
                     <input class="form-control" id="numero_registro" name="numero_registro" type="text" 
                     placeholder="" value="{{ $folio->numero_registro }}">
                     @error('numero_registro')
@@ -117,7 +118,7 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="detenido">Detenido</label>
+                    <label for="detenido">Detenido</label><strong>*</strong>
                     <input class="form-control" id="detenido" name="detenido" type="text" 
                     placeholder="Nombre detenido" value="{{ $folio->detenido }}">
                     @error('detenido')
@@ -127,7 +128,7 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="id_delito">Delito</label>
+                    <label for="id_delito">Delito</label><strong>*</strong>
                     <select class="form-control" name="id_delito" id="id_delito">
                       <option value="">-- Selecciona un delito --</option>
                       @foreach ( $delitos as $delito )
@@ -146,7 +147,7 @@
                 <h4 class="card-title mt-3 mb-3">Datos Solicitante</h4>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="nombre_solicitante">Nombre</label>
+                    <label for="nombre_solicitante">Nombre</label><strong>*</strong>
                     <input class="form-control" id="nombre_solicitante" name="nombre_solicitante" type="text" 
                     placeholder="Nombre solicitante" value="{{ $folio->solicitante->nombre_solicitante }}">
                     @error('nombre_solicitante')
@@ -156,7 +157,7 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="plaza">Plaza</label>
+                    <label for="plaza">Plaza</label><strong>*</strong>
                     <input class="form-control" id="plaza" name="plaza" type="text" 
                     placeholder="Plaza" value="{{ $folio->solicitante->plaza }}">
                     @error('plaza')
@@ -166,7 +167,7 @@
                 </div>
                 <div class="col-md-4 col-12">
                   <div class="form-group">
-                    <label for="gafete">Gafete</label>
+                    <label for="gafete">Gafete</label><strong>*</strong>
                     <input class="form-control" id="gafete" name="gafete" type="text" 
                     placeholder="Gafete" value="{{ $folio->solicitante->gafete }}">
                     @error('gafete')
@@ -176,7 +177,7 @@
                 </div>
                 <div class="col-md-6 col-12">
                   <div class="form-group">
-                    <label for="agencia_mp">Agencia del MP</label>
+                    <label for="agencia_mp">Agencia del MP</label><strong>*</strong>
                     <input class="form-control" id="agencia_mp" name="agencia_mp" type="text" 
                     placeholder="Agencia mp" value="{{ $folio->solicitante->agencia_mp }}">
                     @error('agencia_mp')
@@ -186,7 +187,7 @@
                 </div>
                 <div class="col-md-6 col-12">
                   <div class="form-group">
-                    <label for="turno">Turno</label>
+                    <label for="turno">Turno</label><strong>*</strong>
                     <input class="form-control" id="turno" name="turno" type="text" 
                     placeholder="Turno" value="{{ $folio->solicitante->turno }}">
                     @error('turno')
@@ -196,7 +197,7 @@
                 </div>
                 <div class="col-12 d-flex justify-content-end">
                   <button type="submit" class="btn btn-primary me-1 mb-1">Guardar cambios</button>
-                  <button type="reset" class="btn btn-light-secondary me-1 mb-1">Reiniciar</button>
+                  <button type="reset" class="btn btn-light-secondary me-1 mb-1">Restablecer datos</button>
                 </div>
               </div>
             </form>

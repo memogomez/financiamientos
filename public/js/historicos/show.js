@@ -1,5 +1,5 @@
 $( document ).ready(function(){
-	$( '#folios-table' ).DataTable({
+	$( '#historicos-table' ).DataTable({
 		destroy: true,
 		processing: true,
 		serverSide: true,
@@ -7,25 +7,20 @@ $( document ).ready(function(){
     ordering: false,
     responsive: true,
 		ajax: {
-			url: urlFoliosPaginate,
+			url: urlHistoricosPaginate,
 		},
 		columns: [
-			{ data: 'id_folio', name: 'id_folio', width: '10%', sercheable: true },
-			{ data: 'ticket', name: 'ticket', width: '30%', sercheable: true },
-			{ data: 'folio', name: 'folio', width: '30%', sercheable: true },
-			{ data: 'created_at', name: 'created_at', width: '20%', sercheable: true },
-      { 
+			{ data: 'consecutivo', name: 'consecutivo', width: '10%', sercheable: true },
+			{ data: 'nombre_solicitante', name: 'nombre_solicitante', width: '35%', sercheable: true },
+			{ data: 'agencia_mp', name: 'agencia_mp', width: '35%', sercheable: true },
+			{ data: 'fecha', name: 'fecha', width: '10%', sercheable: true },
+			{ 
         data: null, 
+				width: '10%',
         render: function ( data ) {
-          return `<a href="${ context }/folios/${ data.id_folio }" class="btn btn-info">Consultar</a>`;
-        } 
+          return `<a href="${ context }/historicos/${ data.id_historico }/detail" class="btn btn-info">Consultar</a>`;
+        },
       },
-			{
-				data:null,
-				render: function( data ) {
-					return `<a href="${ context }/folios/${ data.id_folio }/edit" class="btn btn-secondary">Editar</a>`;
-				}
-			},
 		],
 		pageLength: 10,
 		lengthMenu: [ [ 10, 25, 50, 100 ], [ 10, 25, 50, 100 ] ],

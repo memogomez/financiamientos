@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="{{ asset('vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
   <link rel="stylesheet" href="{{ asset('select2/css/select2.min.css') }}">
   <link rel="stylesheet" href="{{ asset('data-tables/datatables.min.css') }}">
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
   @yield('styles')
 </head>
 <body class="sb-nav-fixed">

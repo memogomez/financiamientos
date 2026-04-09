@@ -1,18 +1,18 @@
 @extends('main')
 
-@section('title', 'Ver - Folios | Sigi')
+@section('title', 'Ver - Historicos | Sigi')
 
 @section('content')
 <div class="page-title">
   <div class="row">
     <div class="col-12 col-md-6 order-md-1 order-last">
-      <h3>Folios</h3>
-      <p class="text-subtitle text-muted">Aquí podras consultar los folios que se han generado</p>
+      <h3>Historicos</h3>
+      <p class="text-subtitle text-muted">Aquí podras consultar los folios ya se habían generado en el Excel</p>
     </div>
     <div class="col-12 col-md-6 order-md-2 order-first">
       <nav aria-label="breadcrumb" class='breadcrumb-header'>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="#">Folios</a></li>
+          <li class="breadcrumb-item"><a href="#">Historicos</a></li>
           <li class="breadcrumb-item" aria-current="page">Ver</li>
         </ol>
       </nav>
@@ -30,18 +30,17 @@
 <section class="section">
   <div class="card">
     <div class="card-header">
-      Tabla de Folios
+      Tabla de Historicos
     </div>
     <div class="card-body">
-      <table class='table table-striped' id="folios-table">
+      <table class='table table-striped' id="historicos-table">
         <thead>
           <tr>
-            <th>Id</th>
-            <th>Ticket</th>
-            <th>Folio</th>
+            <th>Consecutivo</th>
+            <th>Solicitante</th>
+            <th>Agencia MP</th>
             <th>Fecha</th>
             <th>Detalle</th>
-            <th>Editar</th>
           </tr>
         </thead>
         <tbody>
@@ -56,7 +55,7 @@
   <script src="{{ asset('data-tables/datatables.min.js') }}"></script>
   <script>
     const context = "{{ url('') }}"
-    const urlFoliosPaginate = "{{ route('folios.paginate') }}";
+    const urlHistoricosPaginate = "{{ route('historicos.paginate') }}";
   </script>
-  <script src="{{ asset('js/folios/show.js') }}"></script>
+  <script src="{{ asset('js/historicos/show.js') }}"></script>
 @endsection

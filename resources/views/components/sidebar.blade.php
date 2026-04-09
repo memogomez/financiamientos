@@ -27,6 +27,17 @@
             </li>
           </ul>
         </li>
+        <li class="sidebar-item has-sub">
+          <a href="#" class="sidebar-link">
+            <i data-feather="archive" width="20"></i>
+            <span>Historico</span>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ route('historicos.show') }}">Ver</a>
+            </li>
+          </ul>
+        </li>
       </ul>
     </div>
     <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>

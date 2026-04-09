@@ -21,7 +21,7 @@ class FolioSolictanteRequest extends FormRequest
      */
     public function rules(): array {
         return [
-            'ticket' => 'required|string',
+            'ticket' => 'max:255',
             'acronimo' => 'required|string|max:255',
             'hora' => 'required|digits:4',
             'dia_mes' => 'required|digits:4',
@@ -40,8 +40,7 @@ class FolioSolictanteRequest extends FormRequest
 
     public function messages(): array {
         return [
-            'ticket.required' => 'El campo ticket es obligatorio',
-            'ticket.string' => 'Ingresa una cadena de texto',
+            'ticket.max' => 'El campo no debe ser mayor a 255 caracteres',
             'acronimo.required' => 'El campo acrónimo es obligatorio',
             'acronimo.string' => 'Ingresa una cadena de texto',
             'acronimo.max' => 'El campo no debe ser mayor a 255 caracteres',
@@ -77,4 +76,30 @@ class FolioSolictanteRequest extends FormRequest
             'turno.max' => 'El campo no debe ser mayor a 255 caracteres',
         ];
     }
+
+    public function folioData(): array {
+        return $this->only([
+            'ticket',
+            'acronimo',
+            'hora',
+            'dia_mes',
+            'anio',
+            'folio',
+            'razon',
+            'numero_registro',
+            'id_delito',
+            'detenido',
+        ]);
+    }
+
+    public function solicitanteData(): array {
+        return $this->only([
+            'nombre_solicitante',
+            'plaza',
+            'gafete',
+            'agencia_mp',
+            'turno',
+        ]);
+    }
+    
 }

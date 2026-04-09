@@ -18,7 +18,7 @@ return new class extends Migration
             $table->bigIncrements('id_folio');
             $table->unsignedBigInteger('id_solicitante');
             $table->foreign('id_solicitante')->references('id_solicitante')->on('solicitantes')->onDelete('cascade');
-            $table->string('ticket');
+            $table->string('ticket')->nullable();
             $table->string('acronimo');
             $table->string('hora');
             $table->string('dia_mes');
