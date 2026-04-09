@@ -54,9 +54,10 @@
                 <i data-feather="search" width="16" class="me-1"></i> Generar
               </button>
               @if($resultados->isNotEmpty())
-                <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
-                  <i data-feather="printer" width="16" class="me-1"></i> Imprimir
-                </button>
+                <a href="{{ route('reportes.exportarExcel', ['fecha_inicio' => $fechaInicio, 'fecha_fin' => $fechaFin]) }}"
+                   class="btn btn-success">
+                  <i data-feather="download" width="16" class="me-1"></i> Exportar Excel
+                </a>
               @endif
             </div>
           </div>
@@ -137,12 +138,3 @@
 </div>
 @endsection
 
-@push('styles')
-<style>
-  @media print {
-    #sidebar, .page-title .breadcrumb-header, .btn, nav { display: none !important; }
-    .card { border: none !important; box-shadow: none !important; }
-    .card-header { border-bottom: 2px solid #000 !important; }
-  }
-</style>
-@endpush

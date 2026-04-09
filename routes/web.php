@@ -45,3 +45,4 @@ Route::put('areas/{area}', [AreaController::class, 'update'])->name('areas.updat
 Route::patch('areas/{area}/toggle-estatus', [AreaController::class, 'toggleEstatus'])->name('areas.toggleEstatus')->middleware('auth');
 
 Route::get('reportes/fechas', [ReporteController::class, 'fechas'])->name('reportes.fechas')->middleware('auth');
+Route::get('reportes/fechas/exportar', [ReporteController::class, 'exportarExcel'])->name('reportes.exportarExcel')->middleware('auth');
