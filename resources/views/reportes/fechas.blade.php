@@ -99,8 +99,6 @@
                   <th>Área</th>
                   <th class="text-center">Solicitudes</th>
                   <th class="text-end">Monto Solicitado</th>
-                  <th class="text-end">Monto Aprobado</th>
-                  <th class="text-end">Total</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,8 +110,6 @@
                     <span class="badge bg-secondary">{{ $row->num_solicitudes }}</span>
                   </td>
                   <td class="text-end">${{ number_format($row->total_solicitado, 2) }}</td>
-                  <td class="text-end">${{ number_format($row->total_aprobado, 2) }}</td>
-                  <td class="text-end fw-bold">${{ number_format($row->total, 2) }}</td>
                 </tr>
                 @endforeach
               </tbody>
@@ -123,9 +119,7 @@
                   <td class="text-center">
                     <span class="badge bg-primary">{{ $totales['num_solicitudes'] }}</span>
                   </td>
-                  <td class="text-end">${{ number_format($totales['total_solicitado'], 2) }}</td>
-                  <td class="text-end">${{ number_format($totales['total_aprobado'], 2) }}</td>
-                  <td class="text-end text-primary">${{ number_format($totales['total'], 2) }}</td>
+                  <td class="text-end text-primary">${{ number_format($totales['total_solicitado'], 2) }}</td>
                 </tr>
               </tfoot>
             </table>
