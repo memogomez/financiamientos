@@ -182,8 +182,8 @@
   @php
     $tiposOficio = [
       'oficio_inicio'        => 'Oficio inicio',
-      'oficio_oficial_mayor' => 'Oficio oficial mayor',
       'oficio_fiscal'        => 'Oficio fiscal',
+      'oficio_oficial_mayor' => 'Oficio oficial mayor',
     ];
   @endphp
 

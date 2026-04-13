@@ -167,26 +167,6 @@
 
                 <div class="col-md-6 col-12">
                   <div class="form-group">
-                    <label for="num_oficio_oficial_mayor">Numero oficio oficial mayor</label>
-                    <input class="form-control" id="num_oficio_oficial_mayor" name="num_oficio_oficial_mayor" type="text" maxlength="100"
-                      value="{{ old('num_oficio_oficial_mayor') }}">
-                    @error('num_oficio_oficial_mayor')
-                      <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                  </div>
-                </div>
-                <div class="col-md-6 col-12">
-                  <div class="form-group">
-                    <label for="archivo_oficio_oficial_mayor">Archivo oficio oficial mayor</label>
-                    <input class="form-control" id="archivo_oficio_oficial_mayor" name="archivo_oficio_oficial_mayor" type="file" accept=".pdf,.jpg,.jpeg,.png">
-                    @error('archivo_oficio_oficial_mayor')
-                      <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                  </div>
-                </div>
-
-                <div class="col-md-6 col-12">
-                  <div class="form-group">
                     <label for="num_oficio_fiscal">Numero oficio fiscal</label>
                     <input class="form-control" id="num_oficio_fiscal" name="num_oficio_fiscal" type="text" maxlength="100"
                       value="{{ old('num_oficio_fiscal') }}">
@@ -200,6 +180,26 @@
                     <label for="archivo_oficio_fiscal">Archivo oficio fiscal</label>
                     <input class="form-control" id="archivo_oficio_fiscal" name="archivo_oficio_fiscal" type="file" accept=".pdf,.jpg,.jpeg,.png">
                     @error('archivo_oficio_fiscal')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="num_oficio_oficial_mayor">Numero oficio oficial mayor</label>
+                    <input class="form-control" id="num_oficio_oficial_mayor" name="num_oficio_oficial_mayor" type="text" maxlength="100"
+                      value="{{ old('num_oficio_oficial_mayor') }}">
+                    @error('num_oficio_oficial_mayor')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="archivo_oficio_oficial_mayor">Archivo oficio oficial mayor</label>
+                    <input class="form-control" id="archivo_oficio_oficial_mayor" name="archivo_oficio_oficial_mayor" type="file" accept=".pdf,.jpg,.jpeg,.png">
+                    @error('archivo_oficio_oficial_mayor')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
