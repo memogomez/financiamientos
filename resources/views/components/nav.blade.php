@@ -16,7 +16,7 @@
           @endauth
         </a>
         <div class="dropdown-menu dropdown-menu-end">
-          <a class="dropdown-item" href="{{ route('user.show') }}"><i data-feather="user"></i> Cuenta</a>
+          <a class="dropdown-item" href="{{ route('users.index') }}"><i data-feather="user"></i> Cuenta</a>
           <div class="dropdown-divider"></div>
           <a class="dropdown-item" href="{{ route('auth.logout') }}"><i data-feather="log-out"></i> Cerrar Sesión</a>
         </div>
