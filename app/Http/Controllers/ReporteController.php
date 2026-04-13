@@ -20,9 +20,7 @@ class ReporteController extends Controller
             ->select(
                 'a.nombre_area',
                 DB::raw('COUNT(s.id) as num_solicitudes'),
-                DB::raw('SUM(s.monto_solicitado) as total_solicitado'),
-                DB::raw('SUM(s.monto_total) as total_aprobado'),
-                DB::raw('SUM(s.total) as total')
+                DB::raw('SUM(s.monto_solicitado) as total_solicitado')
             )
             ->whereBetween('s.fecha', [$fechaInicio, $fechaFin])
             ->where('a.estatus', 1)
@@ -49,10 +47,8 @@ class ReporteController extends Controller
             $resultados = $this->consultarResultados($fechaInicio, $fechaFin);
 
             $totales = [
-                'num_solicitudes' => $resultados->sum('num_solicitudes'),
+                'num_solicitudes'  => $resultados->sum('num_solicitudes'),
                 'total_solicitado' => $resultados->sum('total_solicitado'),
-                'total_aprobado'   => $resultados->sum('total_aprobado'),
-                'total'            => $resultados->sum('total'),
             ];
         }
 
@@ -77,7 +73,7 @@ class ReporteController extends Controller
         $sheet->setTitle('Reporte por Fechas');
 
         // ----- Título -----
-        $sheet->mergeCells('A1:F1');
+        $sheet->mergeCells('A1:D1');
         $sheet->setCellValue('A1', 'Reporte de Solicitudes por Intervalo de Fechas');
         $sheet->getStyle('A1')->applyFromArray([
             'font'      => ['bold' => true, 'size' => 14, 'color' => ['argb' => 'FFFFFFFF']],
@@ -87,7 +83,7 @@ class ReporteController extends Controller
         $sheet->getRowDimension(1)->setRowHeight(28);
 
         // ----- Subtítulo (rango de fechas) -----
-        $sheet->mergeCells('A2:F2');
+        $sheet->mergeCells('A2:D2');
         $fechaInicioFmt = \Carbon\Carbon::parse($fechaInicio)->format('d/m/Y');
         $fechaFinFmt    = \Carbon\Carbon::parse($fechaFin)->format('d/m/Y');
         $sheet->setCellValue('A2', "Del {$fechaInicioFmt} al {$fechaFinFmt}");
@@ -97,13 +93,13 @@ class ReporteController extends Controller
         ]);
 
         // ----- Encabezados de columna -----
-        $headers = ['#', 'Área', 'Solicitudes', 'Monto Solicitado', 'Monto Aprobado', 'Total'];
+        $headers = ['#', 'Área', 'Solicitudes', 'Monto Solicitado'];
         $col = 'A';
         foreach ($headers as $header) {
             $sheet->setCellValue("{$col}3", $header);
             $col++;
         }
-        $sheet->getStyle('A3:F3')->applyFromArray([
+        $sheet->getStyle('A3:D3')->applyFromArray([
             'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
             'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF495057']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
@@ -114,66 +110,48 @@ class ReporteController extends Controller
         // ----- Datos -----
         $fila = 4;
         foreach ($resultados as $i => $row) {
-            $esImpar = ($i % 2 === 0);
-            $bgColor = $esImpar ? 'FFFFFFFF' : 'FFF8F9FA';
+            $bgColor = ($i % 2 === 0) ? 'FFFFFFFF' : 'FFF8F9FA';
 
             $sheet->setCellValue("A{$fila}", $i + 1);
             $sheet->setCellValue("B{$fila}", $row->nombre_area);
             $sheet->setCellValue("C{$fila}", (int) $row->num_solicitudes);
             $sheet->setCellValue("D{$fila}", (float) $row->total_solicitado);
-            $sheet->setCellValue("E{$fila}", (float) $row->total_aprobado);
-            $sheet->setCellValue("F{$fila}", (float) $row->total);
 
-            $sheet->getStyle("A{$fila}:F{$fila}")->applyFromArray([
+            $sheet->getStyle("A{$fila}:D{$fila}")->applyFromArray([
                 'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => $bgColor]],
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FFD0D0D0']]],
             ]);
             $sheet->getStyle("A{$fila}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("C{$fila}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-            foreach (['D', 'E', 'F'] as $montoCol) {
-                $sheet->getStyle("{$montoCol}{$fila}")
-                    ->getNumberFormat()
-                    ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-            }
+            $sheet->getStyle("D{$fila}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
             $fila++;
         }
 
         // ----- Fila de totales -----
         $totales = [
-            'num_solicitudes' => $resultados->sum('num_solicitudes'),
+            'num_solicitudes'  => $resultados->sum('num_solicitudes'),
             'total_solicitado' => $resultados->sum('total_solicitado'),
-            'total_aprobado'   => $resultados->sum('total_aprobado'),
-            'total'            => $resultados->sum('total'),
         ];
 
         $sheet->mergeCells("A{$fila}:B{$fila}");
         $sheet->setCellValue("A{$fila}", 'TOTALES');
         $sheet->setCellValue("C{$fila}", (int) $totales['num_solicitudes']);
         $sheet->setCellValue("D{$fila}", (float) $totales['total_solicitado']);
-        $sheet->setCellValue("E{$fila}", (float) $totales['total_aprobado']);
-        $sheet->setCellValue("F{$fila}", (float) $totales['total']);
 
-        $sheet->getStyle("A{$fila}:F{$fila}")->applyFromArray([
+        $sheet->getStyle("A{$fila}:D{$fila}")->applyFromArray([
             'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
             'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FF2D4A8A']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             'borders'   => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF9AAFD4']]],
         ]);
-        foreach (['D', 'E', 'F'] as $montoCol) {
-            $sheet->getStyle("{$montoCol}{$fila}")
-                ->getNumberFormat()
-                ->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-        }
+        $sheet->getStyle("D{$fila}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
         // ----- Ancho de columnas -----
         $sheet->getColumnDimension('A')->setWidth(6);
         $sheet->getColumnDimension('B')->setWidth(35);
         $sheet->getColumnDimension('C')->setWidth(14);
-        $sheet->getColumnDimension('D')->setWidth(20);
-        $sheet->getColumnDimension('E')->setWidth(20);
-        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->getColumnDimension('D')->setWidth(22);
 
         $nombreArchivo = "reporte_solicitudes_{$fechaInicio}_{$fechaFin}.xlsx";
 

@@ -127,8 +127,8 @@
                 </div>
               </div>
 
-              {{-- Fila 3: Montos + toggle Comprobación en la misma línea --}}
-              <div class="col-md-3 col-sm-6 col-12">
+              {{-- Fila 3: Monto solicitado + Comprobación --}}
+              <div class="col-md-6 col-12">
                 <div class="form-group">
                   <label for="monto_solicitado">Monto solicitado</label>@if(!$soloOficios)<strong>*</strong>@endif
                   <input class="form-control" id="monto_solicitado" name="monto_solicitado" type="number"
@@ -138,27 +138,7 @@
                   @error('monto_solicitado')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
               </div>
-              <div class="col-md-3 col-sm-6 col-12">
-                <div class="form-group">
-                  <label for="monto_total">Monto aprobado</label>@if(!$soloOficios)<strong>*</strong>@endif
-                  <input class="form-control" id="monto_total" name="monto_total" type="number"
-                    step="0.01" min="0" placeholder="0.00"
-                    value="{{ old('monto_total', $solicitud->monto_total) }}"
-                    @if($soloOficios) readonly @endif>
-                  @error('monto_total')<span class="text-danger">{{ $message }}</span>@enderror
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6 col-12">
-                <div class="form-group">
-                  <label for="total">Total</label>@if(!$soloOficios)<strong>*</strong>@endif
-                  <input class="form-control" id="total" name="total" type="number"
-                    step="0.01" min="0" placeholder="0.00"
-                    value="{{ old('total', $solicitud->total) }}"
-                    @if($soloOficios) readonly @endif>
-                  @error('total')<span class="text-danger">{{ $message }}</span>@enderror
-                </div>
-              </div>
-              <div class="col-md-3 col-sm-6 col-12">
+              <div class="col-md-6 col-12">
                 <div class="form-group">
                   <label class="d-block">Comprobación</label>
                   @if($soloOficios)
@@ -177,6 +157,17 @@
                     </div>
                   @endif
                   @error('comprobacion')<span class="text-danger">{{ $message }}</span>@enderror
+                </div>
+              </div>
+
+              {{-- Fila 4: Observaciones --}}
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="observaciones">Observaciones</label>
+                  <textarea class="form-control" id="observaciones" name="observaciones"
+                    rows="3" placeholder="Escribe las observaciones (opcional)"
+                    @if($soloOficios) readonly @endif>{{ old('observaciones', $solicitud->observaciones) }}</textarea>
+                  @error('observaciones')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
               </div>
 

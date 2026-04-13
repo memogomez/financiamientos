@@ -20,18 +20,15 @@ class Solicitud extends Model
         'solicita',
         'dirigido',
         'monto_solicitado',
-        'monto_total',
-        'total',
+        'observaciones',
         'comprobacion',
         'estatus',
     ];
 
     protected $casts = [
-        'fecha' => 'date',
+        'fecha'            => 'date',
         'monto_solicitado' => 'decimal:2',
-        'monto_total' => 'decimal:2',
-        'total' => 'decimal:2',
-        'comprobacion' => 'boolean',
+        'comprobacion'     => 'boolean',
     ];
 
     public function area(): BelongsTo

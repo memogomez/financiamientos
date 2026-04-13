@@ -23,9 +23,10 @@
             <p class="card-text"><strong>Solicita:</strong> {{ $solicitud->solicita }}</p>
             <p class="card-text"><strong>Dirigido:</strong> {{ $solicitud->dirigido }}</p>
             <p class="card-text"><strong>Monto solicitado:</strong> {{ number_format((float) $solicitud->monto_solicitado, 2, '.', ',') }}</p>
-            <p class="card-text"><strong>Monto total:</strong> {{ number_format((float) $solicitud->monto_total, 2, '.', ',') }}</p>
-            <p class="card-text"><strong>Total:</strong> {{ number_format((float) $solicitud->total, 2, '.', ',') }}</p>
             <p class="card-text"><strong>Comprobación:</strong> {{ $solicitud->comprobacion ? 'Sí' : 'No' }}</p>
+            @if($solicitud->observaciones)
+              <p class="card-text"><strong>Observaciones:</strong> {{ $solicitud->observaciones }}</p>
+            @endif
             <p class="card-text"><strong>Estatus:</strong> {{ $solicitud->estatus }}</p>
             <hr>
             <h5 class="card-title">Oficios</h5>
