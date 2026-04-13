@@ -27,7 +27,12 @@ Route::post('login', [AuthController::class, 'login'])->name('auth.login');
 Route::get('logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');
 
 Route::get('inicio', [PrincipalController::class, 'inicio'])->name('principal.inicio')->middleware('auth');
-Route::get('users/', [UserController::class, 'show'])->name('user.show')->middleware('auth');
+Route::get('users',                  [UserController::class, 'index'])->name('users.index')->middleware('auth');
+Route::get('users/crear',            [UserController::class, 'create'])->name('users.create')->middleware('auth');
+Route::post('users/store',           [UserController::class, 'store'])->name('users.store')->middleware('auth');
+Route::get('users/{user}/edit',      [UserController::class, 'edit'])->name('users.edit')->middleware('auth');
+Route::put('users/{user}',           [UserController::class, 'update'])->name('users.update')->middleware('auth');
+Route::patch('users/{user}/toggle',  [UserController::class, 'toggle'])->name('users.toggle')->middleware('auth');
 
 Route::get('solicitudes/show', [SolicitudController::class, 'show'])->name('solicitudes.show')->middleware('auth');
 Route::get('solicitudes/paginate', [SolicitudController::class, 'paginate'])->name('solicitudes.paginate')->middleware('auth');

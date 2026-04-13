@@ -39,6 +39,21 @@
             </li>
           </ul>
         </li>
+        <li class='sidebar-title'>USUARIOS</li>
+        <li class="sidebar-item has-sub">
+          <a href="#" class='sidebar-link'>
+            <i data-feather="users" width="20"></i>
+            <span>Usuarios</span>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ route('users.index') }}">Ver</a>
+            </li>
+            <li>
+              <a href="{{ route('users.create') }}">Crear</a>
+            </li>
+          </ul>
+        </li>
         <li class='sidebar-title'>REPORTES</li>
         <li class="sidebar-item has-sub">
           <a href="#" class='sidebar-link'>
