@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AreaController;
+use App\Http\Controllers\ArchivoController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\PrincipalController;
@@ -51,3 +52,10 @@ Route::patch('areas/{area}/toggle-estatus', [AreaController::class, 'toggleEstat
 
 Route::get('reportes/fechas', [ReporteController::class, 'fechas'])->name('reportes.fechas')->middleware('auth');
 Route::get('reportes/fechas/exportar', [ReporteController::class, 'exportarExcel'])->name('reportes.exportarExcel')->middleware('auth');
+
+Route::get('archivos/show', [ArchivoController::class, 'show'])->name('archivos.show')->middleware('auth');
+Route::get('archivos/paginate', [ArchivoController::class, 'paginate'])->name('archivos.paginate')->middleware('auth');
+Route::get('archivos/crear', [ArchivoController::class, 'create'])->name('archivos.create')->middleware('auth');
+Route::post('archivos/store', [ArchivoController::class, 'store'])->name('archivos.store')->middleware('auth');
+Route::get('archivos/descargar/{nombre}', [ArchivoController::class, 'descargar'])->name('archivos.descargar')->middleware('auth');
+Route::get('archivos/buscar', [ArchivoController::class, 'buscar'])->name('archivos.buscar')->middleware('auth');
