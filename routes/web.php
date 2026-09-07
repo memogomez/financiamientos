@@ -41,6 +41,7 @@ Route::post('solicitudes/store', [SolicitudController::class, 'store'])->name('s
 Route::get('solicitudes/{solicitud}/edit', [SolicitudController::class, 'edit'])->name('solicitudes.edit')->middleware('auth');
 Route::put('solicitudes/{solicitud}', [SolicitudController::class, 'update'])->name('solicitudes.update')->middleware('auth');
 Route::get('solicitudes/{solicitud}/success', [SolicitudController::class, 'success'])->name('solicitudes.success')->middleware('auth');
+Route::get('solicitudes/{solicitud}/generar-oficio', [SolicitudController::class, 'generarOficio'])->name('solicitudes.generarOficio')->middleware('auth');
 
 Route::get('areas/show', [AreaController::class, 'show'])->name('areas.show')->middleware('auth');
 Route::get('areas/crear', [AreaController::class, 'create'])->name('areas.create')->middleware('auth');

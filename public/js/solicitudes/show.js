@@ -40,6 +40,14 @@ $(document).ready(function () {
         width: '9%',
         searchable: false,
         render: function (data) {
+          return `<a href="${context}/solicitudes/${data.id}/generar-oficio" class="btn btn-sm btn-success">Generar Oficio</a>`;
+        },
+      },
+      {
+        data: null,
+        width: '9%',
+        searchable: false,
+        render: function (data) {
           return `<a href="${context}/solicitudes/${data.id}/edit" class="btn btn-sm btn-warning">Editar</a>`;
         },
       },

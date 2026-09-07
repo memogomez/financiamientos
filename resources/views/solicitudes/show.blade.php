@@ -50,6 +50,7 @@
             <th>Fecha</th>
             <th>Comprobación</th>
             <th>Oficios</th>
+            <th>Oficio</th>
             <th>Editar</th>
           </tr>
         </thead>
