@@ -70,8 +70,22 @@ class ArchivoController extends Controller
             $slugged = Str::slug($baseFileName) ?: 'archivo';
             $fileName = time() . '_' . $slugged . '.pdf';
 
-            $rutaArchivo = $file->storeAs('upload', $fileName, 'local');
-            $absolutePath = storage_path('app/' . $rutaArchivo);
+            $uploadDir = storage_path('app/upload');
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            $absolutePath = $uploadDir . DIRECTORY_SEPARATOR . $fileName;
+            $file->move($uploadDir, $fileName);
+
+            if (!file_exists($absolutePath)) {
+                DB::connection('mysql')->rollBack();
+                return back()->withInput()->withErrors([
+                    'file_input' => 'No se pudo guardar el archivo. Verifica que la carpeta storage/app/upload/ tenga permisos de escritura.',
+                ]);
+            }
+
+            $rutaArchivo = 'upload/' . $fileName;
 
             $archivo = Archivo::create([
                 'nombre_archivo' => $cleanName,
