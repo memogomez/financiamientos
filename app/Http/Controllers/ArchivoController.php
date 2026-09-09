@@ -65,7 +65,10 @@ class ArchivoController extends Controller
             $file = $request->file('file_input');
             $originalName = $file->getClientOriginalName();
             $cleanName = preg_replace('/[[:^print:]]/', '', $originalName);
-            $fileName = time() . '_' . Str::slug(pathinfo($cleanName, PATHINFO_FILENAME)) . '.pdf';
+
+            $baseFileName = pathinfo($cleanName, PATHINFO_FILENAME);
+            $slugged = Str::slug($baseFileName) ?: 'archivo';
+            $fileName = time() . '_' . $slugged . '.pdf';
 
             $rutaArchivo = $file->storeAs('upload', $fileName, 'local');
             $absolutePath = storage_path('app/' . $rutaArchivo);
