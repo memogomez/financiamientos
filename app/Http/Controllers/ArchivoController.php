@@ -60,8 +60,6 @@ class ArchivoController extends Controller
         ]);
 
         try {
-            DB::connection('mysql')->beginTransaction();
-
             $file = $request->file('file_input');
             $originalName = $file->getClientOriginalName();
             $cleanName = preg_replace('/[[:^print:]]/', '', $originalName);
@@ -79,7 +77,6 @@ class ArchivoController extends Controller
             $file->move($uploadDir, $fileName);
 
             if (!file_exists($absolutePath)) {
-                DB::connection('mysql')->rollBack();
                 return back()->withInput()->withErrors([
                     'file_input' => 'No se pudo guardar el archivo. Verifica que la carpeta storage/app/upload/ tenga permisos de escritura.',
                 ]);
@@ -120,19 +117,15 @@ class ArchivoController extends Controller
 
             if (!$process->isSuccessful()) {
                 $archivo->delete();
-                DB::connection('mysql')->rollBack();
+                @unlink($absolutePath);
 
                 return back()->withInput()->withErrors([
                     'file_input' => 'Error al procesar el PDF: ' . $process->getErrorOutput() . $process->getOutput(),
                 ]);
             }
 
-            DB::connection('mysql')->commit();
-
             return redirect()->route('archivos.show')->with('success', 'Archivo subido y procesado correctamente.');
         } catch (\Exception $e) {
-            DB::connection('mysql')->rollBack();
-
             return back()->withInput()->withErrors([
                 'file_input' => 'Error: ' . $e->getMessage(),
             ]);
