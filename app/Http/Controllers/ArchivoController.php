@@ -23,7 +23,7 @@ class ArchivoController extends Controller
         }
 
         $query = DB::table('archivos as a')
-            ->select('a.id', 'a.nombre_archivo', 'a.fecha_subida', 'a.fecha_archivo');
+            ->select('a.id', 'a.nombre_archivo', 'a.ruta_archivo', 'a.fecha_subida', 'a.fecha_archivo');
 
         if ($request->has('search') && $request->get('search')['value']) {
             $searchValue = $request->get('search')['value'];
@@ -38,6 +38,11 @@ class ArchivoController extends Controller
         $start  = (int) $request->get('start', 0);
         $length = (int) $request->get('length', 10);
         $archivos = $query->offset($start)->limit($length)->get();
+
+        $archivos = $archivos->map(function ($archivo) {
+            $archivo->archivo_fisico = basename($archivo->ruta_archivo);
+            return $archivo;
+        });
 
         return response()->json([
             'draw'            => (int) $request->get('draw'),

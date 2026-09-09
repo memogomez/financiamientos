@@ -19,7 +19,7 @@ $(document).ready(function () {
         searchable: false,
         className: 'text-center',
         render: function (data) {
-          return `<a href="${context}/archivos/descargar/${data.nombre_archivo}" class="btn btn-sm btn-info" title="Descargar">Descargar</a>`;
+          return `<a href="${context}/archivos/descargar/${data.archivo_fisico}" class="btn btn-sm btn-info" title="Descargar">Descargar</a>`;
         },
       },
     ],
