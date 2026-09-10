@@ -45,6 +45,9 @@ try:
     pages_count = len(doc)
     print(f"Total de páginas detectadas: {pages_count}")
 
+    total_text_extracted = 0
+    is_scanned = True  # Asumir escaneado hasta que encontremos texto
+
     for page_num in range(pages_count):
         page = doc.load_page(page_num)
 
@@ -53,20 +56,38 @@ try:
 
         # Si el texto está vacío, intentar con otro método (blocks)
         if not texto.strip():
-            texto = page.get_text("blocks")
-            # Filtrar bloques que no sean texto
-            if isinstance(texto, list):
-                texto = '\n'.join([block[4] for block in texto if isinstance(block, (list, tuple)) and len(block) > 4])
+            try:
+                blocks = page.get_text("blocks")
+                if isinstance(blocks, list):
+                    texto = '\n'.join([str(block[4]) for block in blocks
+                                      if isinstance(block, (list, tuple)) and len(block) > 4
+                                      and block[4].strip()])
+            except:
+                pass
 
         # Si sigue vacío, intentar con dict
         if not texto.strip():
-            texto = page.get_text("dict")
-            if isinstance(texto, dict) and "blocks" in texto:
-                texto = '\n'.join([block.get('lines', []) for block in texto['blocks']])
+            try:
+                text_dict = page.get_text("dict")
+                if isinstance(text_dict, dict) and "blocks" in text_dict:
+                    texts = []
+                    for block in text_dict['blocks']:
+                        if block.get('type') == 0:  # 0 = texto, 1 = imagen
+                            if 'lines' in block:
+                                for line in block['lines']:
+                                    for span in line.get('spans', []):
+                                        texts.append(span.get('text', ''))
+                    texto = '\n'.join(texts)
+            except:
+                pass
+
+        # Contar caracteres
+        texto_len = len(texto.strip()) if isinstance(texto, str) else 0
+        total_text_extracted += texto_len
 
         # Log de depuración
-        texto_len = len(texto.strip()) if isinstance(texto, str) else 0
-        print(f"Página {page_num + 1}: {texto_len} caracteres extraídos")
+        status = "✓" if texto_len > 0 else "✗"
+        print(f"Página {page_num + 1}: {status} {texto_len} caracteres")
 
         # Convertir a string si es necesario
         if not isinstance(texto, str):
@@ -78,7 +99,19 @@ try:
         )
 
     conn.commit()
-    print(f'Paginas guardadas para archivo_id: {archivo_id}')
+
+    # Determinar si es escaneado
+    if total_text_extracted == 0:
+        is_scanned = True
+        print(f"\n⚠️  ADVERTENCIA: PDF escaneado (sin texto extractable)")
+        print(f"Para extraer texto de PDFs escaneados, instale Tesseract OCR:")
+        print(f"https://github.com/UB-Mannheim/tesseract/wiki")
+    else:
+        is_scanned = False
+        print(f"\n✓ Total de caracteres extraídos: {total_text_extracted}")
+
+    print(f"Paginas guardadas para archivo_id: {archivo_id}")
+
 except Exception as e:
     print(f"Error al procesar el PDF: {e}")
     import traceback
