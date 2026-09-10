@@ -86,8 +86,8 @@ try:
         total_text_extracted += texto_len
 
         # Log de depuración
-        status = "✓" if texto_len > 0 else "✗"
-        print(f"Página {page_num + 1}: {status} {texto_len} caracteres")
+        status = "OK" if texto_len > 0 else "FAIL"
+        print(f"Pagina {page_num + 1}: {status} {texto_len} caracteres")
 
         # Convertir a string si es necesario
         if not isinstance(texto, str):
@@ -103,12 +103,12 @@ try:
     # Determinar si es escaneado
     if total_text_extracted == 0:
         is_scanned = True
-        print(f"\n⚠️  ADVERTENCIA: PDF escaneado (sin texto extractable)")
+        print(f"\nADVERTENCIA: PDF escaneado (sin texto extractable)")
         print(f"Para extraer texto de PDFs escaneados, instale Tesseract OCR:")
         print(f"https://github.com/UB-Mannheim/tesseract/wiki")
     else:
         is_scanned = False
-        print(f"\n✓ Total de caracteres extraídos: {total_text_extracted}")
+        print(f"\nExito: Total de caracteres extraidos: {total_text_extracted}")
 
     print(f"Paginas guardadas para archivo_id: {archivo_id}")
 
