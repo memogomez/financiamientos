@@ -160,19 +160,28 @@ class ArchivoController extends Controller
         if ($query) {
             $resultados = DB::table('paginas')
                 ->join('archivos', 'archivos.id', '=', 'paginas.archivo_id')
-                ->select('archivos.nombre_archivo', 'paginas.numero_pagina', 'paginas.texto', 'archivos.fecha_archivo')
-                ->when($modo === 'frase', fn ($q) => $q->where('paginas.texto', 'LIKE', "%{$query}%"))
-                ->when($modo !== 'frase', function ($q) use ($query) {
-                    $palabras = preg_split('/\s+/', $query);
+                ->select('archivos.nombre_archivo', 'paginas.numero_pagina', 'paginas.texto', 'archivos.fecha_archivo');
+
+            if ($modo === 'frase') {
+                $resultados->where('paginas.texto', 'LIKE', "%{$query}%");
+            } else {
+                $palabras = array_filter(preg_split('/\s+/', $query));
+                $resultados->where(function ($q) use ($palabras) {
                     foreach ($palabras as $palabra) {
-                        $q->where('paginas.texto', 'LIKE', "%{$palabra}%");
+                        $q->orWhere('paginas.texto', 'LIKE', "%{$palabra}%");
                     }
-                    return $q;
-                })
-                ->when($fechaInicio, fn ($q) => $q->whereDate('archivos.fecha_archivo', '>=', $fechaInicio))
-                ->when($fechaFin, fn ($q) => $q->whereDate('archivos.fecha_archivo', '<=', $fechaFin))
-                ->orderBy('archivos.fecha_archivo', 'desc')
-                ->get();
+                });
+            }
+
+            if ($fechaInicio) {
+                $resultados->whereDate('archivos.fecha_archivo', '>=', $fechaInicio);
+            }
+
+            if ($fechaFin) {
+                $resultados->whereDate('archivos.fecha_archivo', '<=', $fechaFin);
+            }
+
+            $resultados = $resultados->orderBy('archivos.fecha_archivo', 'desc')->get();
         }
 
         return view('archivos.buscar', compact('resultados', 'query', 'modo', 'fechaInicio', 'fechaFin'));
