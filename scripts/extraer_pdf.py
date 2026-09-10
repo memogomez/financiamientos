@@ -42,17 +42,47 @@ try:
         sys.exit(1)
 
     doc = fitz.open(pdf_path)
-    for page_num in range(len(doc)):
+    pages_count = len(doc)
+    print(f"Total de páginas detectadas: {pages_count}")
+
+    for page_num in range(pages_count):
         page = doc.load_page(page_num)
+
+        # Intentar extraer texto con el método default
         texto = page.get_text()
+
+        # Si el texto está vacío, intentar con otro método (blocks)
+        if not texto.strip():
+            texto = page.get_text("blocks")
+            # Filtrar bloques que no sean texto
+            if isinstance(texto, list):
+                texto = '\n'.join([block[4] for block in texto if isinstance(block, (list, tuple)) and len(block) > 4])
+
+        # Si sigue vacío, intentar con dict
+        if not texto.strip():
+            texto = page.get_text("dict")
+            if isinstance(texto, dict) and "blocks" in texto:
+                texto = '\n'.join([block.get('lines', []) for block in texto['blocks']])
+
+        # Log de depuración
+        texto_len = len(texto.strip()) if isinstance(texto, str) else 0
+        print(f"Página {page_num + 1}: {texto_len} caracteres extraídos")
+
+        # Convertir a string si es necesario
+        if not isinstance(texto, str):
+            texto = str(texto)
+
         cursor.execute(
             "INSERT INTO paginas (archivo_id, numero_pagina, texto) VALUES (%s, %s, %s)",
             (archivo_id, page_num + 1, texto)
         )
+
     conn.commit()
     print(f'Paginas guardadas para archivo_id: {archivo_id}')
 except Exception as e:
     print(f"Error al procesar el PDF: {e}")
+    import traceback
+    traceback.print_exc()
     sys.exit(1)
 finally:
     cursor.close()
