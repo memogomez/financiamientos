@@ -10,12 +10,14 @@ $(document).ready(function () {
       url: urlArchivosPaginate,
     },
     columns: [
-      { data: 'nombre_archivo', name: 'nombre_archivo', width: '40%', searchable: true },
-      { data: 'fecha_subida',    name: 'fecha_subida',  width: '25%', searchable: false },
-      { data: 'fecha_archivo',   name: 'fecha_archivo', width: '20%', searchable: false },
+      { data: 'nombre_archivo', name: 'nombre_archivo', width: '30%', searchable: true },
+      { data: 'numero_oficio',  name: 'numero_oficio',  width: '15%', searchable: true },
+      { data: 'nombre_area',    name: 'nombre_area',    width: '20%', searchable: true },
+      { data: 'fecha_archivo',  name: 'fecha_archivo',  width: '12%', searchable: false },
+      { data: 'fecha_subida',   name: 'fecha_subida',   width: '12%', searchable: false },
       {
         data: null,
-        width: '15%',
+        width: '11%',
         searchable: false,
         className: 'text-center',
         render: function (data) {

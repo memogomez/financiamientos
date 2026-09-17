@@ -10,6 +10,11 @@ class Archivo extends Model
     use HasFactory;
 
     protected $table = 'archivos';
-    protected $fillable = ['nombre_archivo', 'ruta_archivo', 'fecha_subida', 'fecha_archivo'];
+    protected $fillable = ['nombre_archivo', 'ruta_archivo', 'fecha_subida', 'fecha_archivo', 'numero_oficio', 'id_area'];
     public $timestamps = false;
+
+    public function area()
+    {
+        return $this->belongsTo(Area::class, 'id_area');
+    }
 }

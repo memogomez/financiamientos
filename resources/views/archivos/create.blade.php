@@ -57,6 +57,34 @@
                   </div>
                 </div>
 
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="numero_oficio">Número de Oficio</label><strong>*</strong>
+                    <input class="form-control" id="numero_oficio" name="numero_oficio" type="text" required
+                      value="{{ old('numero_oficio') }}">
+                    @error('numero_oficio')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="id_area">Área</label><strong>*</strong>
+                    <select class="form-control" id="id_area" name="id_area" required>
+                      <option value="">-- Selecciona un área --</option>
+                      @foreach ($areas as $area)
+                        <option value="{{ $area->id }}" @selected(old('id_area') == $area->id)>
+                          {{ $area->nombre_area }}
+                        </option>
+                      @endforeach
+                    </select>
+                    @error('id_area')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+
                 <div class="col-12">
                   <div class="form-group">
                     <label for="fecha_archivo">Fecha del archivo</label><strong>*</strong>
@@ -73,7 +101,7 @@
               <div class="row">
                 <div class="col-12 d-flex justify-content-between">
                   <a href="{{ route('archivos.show') }}" class="btn btn-secondary">Cancelar</a>
-                  <button type="submit" class="btn btn-primary">Subir y procesar</button>
+                  <button type="submit" class="btn btn-primary">Subir archivo</button>
                 </div>
               </div>
             </form>

@@ -45,8 +45,10 @@
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Fecha Subida</th>
+            <th>Número de Oficio</th>
+            <th>Área</th>
             <th>Fecha Archivo</th>
+            <th>Fecha Subida</th>
             <th>Acciones</th>
           </tr>
         </thead>

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Area;
 use App\Models\Archivo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
 
 class ArchivoController extends Controller
 {
@@ -23,12 +23,15 @@ class ArchivoController extends Controller
         }
 
         $query = DB::table('archivos as a')
-            ->select('a.id', 'a.nombre_archivo', 'a.ruta_archivo', 'a.fecha_subida', 'a.fecha_archivo');
+            ->leftJoin('areas as ar', 'a.id_area', '=', 'ar.id')
+            ->select('a.id', 'a.nombre_archivo', 'a.ruta_archivo', 'a.fecha_subida', 'a.fecha_archivo', 'a.numero_oficio', 'ar.nombre_area');
 
         if ($request->has('search') && $request->get('search')['value']) {
             $searchValue = $request->get('search')['value'];
             $query->where(function ($q) use ($searchValue) {
-                $q->where('a.nombre_archivo', 'like', '%' . $searchValue . '%');
+                $q->where('a.nombre_archivo', 'like', '%' . $searchValue . '%')
+                  ->orWhere('a.numero_oficio', 'like', '%' . $searchValue . '%')
+                  ->orWhere('ar.nombre_area', 'like', '%' . $searchValue . '%');
             });
         }
 
@@ -54,7 +57,8 @@ class ArchivoController extends Controller
 
     public function create()
     {
-        return view('archivos.create');
+        $areas = Area::where('estatus', 1)->orderBy('nombre_area')->get();
+        return view('archivos.create', compact('areas'));
     }
 
     public function store(Request $request)
@@ -62,6 +66,8 @@ class ArchivoController extends Controller
         $request->validate([
             'file_input' => 'required|file|mimes:pdf|max:20480',
             'fecha_archivo' => 'required|date',
+            'numero_oficio' => 'required|string|unique:archivos,numero_oficio',
+            'id_area' => 'required|exists:areas,id',
         ]);
 
         try {
@@ -89,47 +95,16 @@ class ArchivoController extends Controller
 
             $rutaArchivo = 'upload/' . $fileName;
 
-            $archivo = Archivo::create([
+            Archivo::create([
                 'nombre_archivo' => $cleanName,
                 'ruta_archivo' => 'storage/' . $rutaArchivo,
                 'fecha_subida' => now(),
                 'fecha_archivo' => $request->input('fecha_archivo'),
+                'numero_oficio' => $request->input('numero_oficio'),
+                'id_area' => $request->input('id_area'),
             ]);
 
-            $pythonPath = env('PYTHON_PATH', 'python');
-            $scriptPath = base_path('scripts/extraer_pdf.py');
-
-            $processEnv = [
-                'DB_HOST' => (string) config('database.connections.mysql.host'),
-                'DB_USERNAME' => (string) config('database.connections.mysql.username'),
-                'DB_PASSWORD' => (string) config('database.connections.mysql.password'),
-                'DB_DATABASE' => (string) config('database.connections.mysql.database'),
-            ];
-
-            if ($pythonPathEnv = env('PYTHONPATH')) {
-                $processEnv['PYTHONPATH'] = $pythonPathEnv;
-            }
-
-            $process = new Process([
-                $pythonPath,
-                $scriptPath,
-                (string) $archivo->id,
-                $absolutePath,
-            ], null, $processEnv);
-
-            $process->setTimeout(300);
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                $archivo->delete();
-                @unlink($absolutePath);
-
-                return back()->withInput()->withErrors([
-                    'file_input' => 'Error al procesar el PDF: ' . $process->getErrorOutput() . $process->getOutput(),
-                ]);
-            }
-
-            return redirect()->route('archivos.show')->with('success', 'Archivo subido y procesado correctamente.');
+            return redirect()->route('archivos.show')->with('success', 'Archivo subido correctamente.');
         } catch (\Exception $e) {
             return back()->withInput()->withErrors([
                 'file_input' => 'Error: ' . $e->getMessage(),
@@ -150,40 +125,48 @@ class ArchivoController extends Controller
 
     public function buscar(Request $request)
     {
-        $query = trim($request->input('query', ''));
-        $modo = $request->input('modo', 'palabras');
+        $numeroOficio = trim($request->input('numero_oficio', ''));
+        $nombreArchivo = trim($request->input('nombre_archivo', ''));
+        $idArea = $request->input('id_area');
         $fechaInicio = $request->input('fecha_inicio');
         $fechaFin = $request->input('fecha_fin');
 
+        $areas = Area::where('estatus', 1)->orderBy('nombre_area')->get();
         $resultados = [];
 
-        if ($query) {
-            $resultados = DB::table('paginas')
-                ->join('archivos', 'archivos.id', '=', 'paginas.archivo_id')
-                ->select('archivos.nombre_archivo', 'paginas.numero_pagina', 'paginas.texto', 'archivos.fecha_archivo');
+        if ($numeroOficio || $nombreArchivo || $idArea || $fechaInicio || $fechaFin) {
+            $query = DB::table('archivos as a')
+                ->leftJoin('areas as ar', 'a.id_area', '=', 'ar.id')
+                ->select('a.id', 'a.nombre_archivo', 'a.numero_oficio', 'a.fecha_archivo', 'ar.nombre_area', 'a.ruta_archivo');
 
-            if ($modo === 'frase') {
-                $resultados->where('paginas.texto', 'LIKE', "%{$query}%");
-            } else {
-                $palabras = array_filter(preg_split('/\s+/', $query));
-                $resultados->where(function ($q) use ($palabras) {
-                    foreach ($palabras as $palabra) {
-                        $q->orWhere('paginas.texto', 'LIKE', "%{$palabra}%");
-                    }
-                });
+            if ($numeroOficio) {
+                $query->where('a.numero_oficio', 'like', "%{$numeroOficio}%");
+            }
+
+            if ($nombreArchivo) {
+                $query->where('a.nombre_archivo', 'like', "%{$nombreArchivo}%");
+            }
+
+            if ($idArea) {
+                $query->where('a.id_area', $idArea);
             }
 
             if ($fechaInicio) {
-                $resultados->whereDate('archivos.fecha_archivo', '>=', $fechaInicio);
+                $query->whereDate('a.fecha_archivo', '>=', $fechaInicio);
             }
 
             if ($fechaFin) {
-                $resultados->whereDate('archivos.fecha_archivo', '<=', $fechaFin);
+                $query->whereDate('a.fecha_archivo', '<=', $fechaFin);
             }
 
-            $resultados = $resultados->orderBy('archivos.fecha_archivo', 'desc')->get();
+            $resultados = $query->orderBy('a.fecha_archivo', 'desc')->get();
+
+            $resultados = $resultados->map(function ($archivo) {
+                $archivo->archivo_fisico = basename($archivo->ruta_archivo);
+                return $archivo;
+            });
         }
 
-        return view('archivos.buscar', compact('resultados', 'query', 'modo', 'fechaInicio', 'fechaFin'));
+        return view('archivos.buscar', compact('resultados', 'numeroOficio', 'nombreArchivo', 'idArea', 'fechaInicio', 'fechaFin', 'areas'));
     }
 }
