@@ -9,6 +9,9 @@ use App\Models\Solicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\SimpleType\Jc;
+use PhpOffice\PhpWord\IOFactory;
 
 class SolicitudController extends Controller
 {
@@ -164,6 +167,174 @@ class SolicitudController extends Controller
         $solicitud->load(['area', 'usuario', 'oficios']);
 
         return view('solicitudes.success', compact('solicitud'));
+    }
+
+    public function generarOficio(Solicitud $solicitud)
+    {
+        $solicitud->load(['area', 'oficios']);
+        $oficiosPorTipo = $solicitud->oficios->keyBy('tipo_oficio');
+        $oficioInicio   = $oficiosPorTipo->get('oficio_inicio');
+
+        $numOficio  = $oficioInicio?->num_oficio ?: '_______________';
+        $fechaDoc   = $solicitud->fecha
+            ? \Carbon\Carbon::parse($solicitud->fecha)->locale('es')->isoFormat('D [de] MMMM [de] YYYY')
+            : now()->locale('es')->isoFormat('D [de] MMMM [de] YYYY');
+        $monto      = '$' . number_format((float) $solicitud->monto_solicitado, 2, '.', ',');
+        $montoLetras = strtoupper(number_format((float) $solicitud->monto_solicitado, 2)) . ' M.N.';
+        $dirigido   = $solicitud->dirigido ?? '_______________';
+        $solicita   = $solicitud->solicita ?? '_______________';
+        $area       = $solicitud->area?->nombre_area ?? '_______________';
+
+        // ── Imágenes ──────────────────────────────────────────────────────────
+        $imgEdomex = public_path('images/edomex.png');
+        $imgLogo   = public_path('images/logo.png');
+
+        // ── Documento ─────────────────────────────────────────────────────────
+        $phpWord = new PhpWord();
+        // Márgenes en twips (1 cm ≈ 567 twips)
+        $phpWord->addSection([
+            'marginTop'    => 850,
+            'marginBottom' => 850,
+            'marginLeft'   => 1200,
+            'marginRight'  => 1200,
+            'paperSize'    => 'Letter',
+        ]);
+        $section = $phpWord->getSection(0);
+
+        // ── Estilos globales ──────────────────────────────────────────────────
+        $phpWord->addFontStyle('normal',    ['name' => 'Arial', 'size' => 10]);
+        $phpWord->addFontStyle('bold',      ['name' => 'Arial', 'size' => 10, 'bold' => true]);
+        $phpWord->addFontStyle('boldUnder', ['name' => 'Arial', 'size' => 10, 'bold' => true, 'underline' => 'single']);
+        $phpWord->addFontStyle('center10',  ['name' => 'Arial', 'size' => 10]);
+        $phpWord->addFontStyle('small',     ['name' => 'Arial', 'size' => 8]);
+        $phpWord->addFontStyle('italic10',  ['name' => 'Arial', 'size' => 10, 'italic' => true]);
+
+        // ── ENCABEZADO: tabla con logos ───────────────────────────────────────
+        $tblHeader = $section->addTable(['borderSize' => 0, 'borderColor' => 'FFFFFF', 'cellMargin' => 0]);
+        $tblHeader->addRow(1200);
+
+        $cellLeft = $tblHeader->addCell(2000);
+        if (file_exists($imgEdomex)) {
+            $cellLeft->addImage($imgEdomex, ['width' => 70, 'height' => 70, 'alignment' => Jc::LEFT]);
+        }
+
+        $cellCenter = $tblHeader->addCell(6500);
+        $cellCenter->addText(''); // espaciado
+
+        $cellRight = $tblHeader->addCell(2000);
+        if (file_exists($imgLogo)) {
+            $cellRight->addImage($imgLogo, ['width' => 70, 'height' => 70, 'alignment' => Jc::RIGHT]);
+        }
+
+        // ── Línea separadora ─────────────────────────────────────────────────
+        $section->addTextBreak(1);
+        $parBorder = $section->addText('', 'normal', ['borderBottomSize' => 6, 'borderBottomColor' => '000000', 'spaceAfter' => 60]);
+
+        // ── Año del lema ─────────────────────────────────────────────────────
+        $section->addText(
+            '"' . now()->year . '. AÑO DEL HUMANISMO MEXICANO EN EL ESTADO DE MÉXICO"',
+            ['name' => 'Arial', 'size' => 9, 'bold' => true],
+            ['alignment' => Jc::CENTER, 'spaceAfter' => 100]
+        );
+
+        // ── Número de oficio y fecha (derecha) ────────────────────────────────
+        $section->addText(
+            "Oficio Número: {$numOficio}.",
+            ['name' => 'Arial', 'size' => 10],
+            ['alignment' => Jc::RIGHT, 'spaceAfter' => 0]
+        );
+        $section->addText(
+            "Toluca, México, a {$fechaDoc}.",
+            ['name' => 'Arial', 'size' => 10],
+            ['alignment' => Jc::RIGHT, 'spaceAfter' => 300]
+        );
+
+        // ── Destinatario ─────────────────────────────────────────────────────
+        $section->addText($dirigido . ',', 'bold', ['spaceAfter' => 0]);
+        $section->addText("Área: {$area}.", 'normal', ['spaceAfter' => 0]);
+        $section->addText('P r e s e n t e.', 'bold', ['spaceAfter' => 300]);
+
+        // ── Cuerpo del oficio ─────────────────────────────────────────────────
+        $cuerpo = $section->addTextRun(['alignment' => Jc::BOTH, 'spaceAfter' => 200]);
+        $cuerpo->addText("\t");
+        $cuerpo->addText(
+            "Me refiero al oficio presentado por ",
+            ['name' => 'Arial', 'size' => 10]
+        );
+        $cuerpo->addText(
+            $solicita,
+            ['name' => 'Arial', 'size' => 10, 'bold' => true]
+        );
+        $cuerpo->addText(
+            ", mediante el cual, entre otros, solicita se autorice la ministración de recursos por la cantidad de ",
+            ['name' => 'Arial', 'size' => 10]
+        );
+        $cuerpo->addText(
+            "{$monto} ({$montoLetras})",
+            ['name' => 'Arial', 'size' => 10, 'bold' => true]
+        );
+        $cuerpo->addText(
+            ", con el propósito de solventar los gastos inherentes a las actividades del área solicitante.",
+            ['name' => 'Arial', 'size' => 10]
+        );
+
+        if ($solicitud->observaciones) {
+            $section->addTextBreak(1);
+            $obs = $section->addTextRun(['alignment' => Jc::BOTH, 'spaceAfter' => 200]);
+            $obs->addText("\t");
+            $obs->addText($solicitud->observaciones, ['name' => 'Arial', 'size' => 10]);
+        }
+
+        // ── Párrafo de cierre ─────────────────────────────────────────────────
+        $section->addTextBreak(1);
+        $cierre = $section->addTextRun(['alignment' => Jc::BOTH, 'spaceAfter' => 400]);
+        $cierre->addText("\t");
+        $cierre->addText(
+            'Lo anterior, para los efectos y trámites correspondientes.',
+            ['name' => 'Arial', 'size' => 10]
+        );
+
+        // ── Atentamente + firma ───────────────────────────────────────────────
+        $section->addText('Atentamente', ['name' => 'Arial', 'size' => 10], ['alignment' => Jc::CENTER, 'spaceAfter' => 800]);
+        $section->addText(
+            'LIC. JOSÉ LUIS CERVANTES MARTÍNEZ,',
+            ['name' => 'Arial', 'size' => 10, 'bold' => true],
+            ['alignment' => Jc::CENTER, 'spaceAfter' => 0]
+        );
+        $section->addText(
+            'Fiscal General de Justicia del Estado de México.',
+            ['name' => 'Arial', 'size' => 10],
+            ['alignment' => Jc::CENTER, 'spaceAfter' => 600]
+        );
+
+        // ── Línea pie + datos institucionales ────────────────────────────────
+        $section->addText('', 'normal', ['borderTopSize' => 6, 'borderTopColor' => '000000', 'spaceAfter' => 60]);
+        $section->addText(
+            'FISCALÍA GENERAL DE JUSTICIA DEL ESTADO DE MÉXICO',
+            ['name' => 'Arial', 'size' => 8, 'bold' => true],
+            ['alignment' => Jc::CENTER, 'spaceAfter' => 0]
+        );
+        $section->addText(
+            'AV. MORELOS ORIENTE NO. 1300, 6TO PISO, COL. SAN SEBASTIÁN, TOLUCA, ESTADO DE MÉXICO, C.P. 50090',
+            ['name' => 'Arial', 'size' => 7],
+            ['alignment' => Jc::CENTER, 'spaceAfter' => 0]
+        );
+        $section->addText(
+            'TELS. 722 226 16 00, 722 226 17 00. Ext. 73325',
+            ['name' => 'Arial', 'size' => 7],
+            ['alignment' => Jc::CENTER]
+        );
+
+        // ── Descarga ──────────────────────────────────────────────────────────
+        $nombreArchivo = "oficio_solicitud_{$solicitud->id}.docx";
+
+        return response()->streamDownload(function () use ($phpWord) {
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save('php://output');
+        }, $nombreArchivo, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'Cache-Control' => 'max-age=0',
+        ]);
     }
 
     /**
