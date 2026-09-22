@@ -27,6 +27,24 @@
             </li>
           </ul>
         </li>
+        <li class='sidebar-title'>ARCHIVOS</li>
+        <li class="sidebar-item has-sub">
+          <a href="#" class='sidebar-link'>
+            <i data-feather="file-text" width="20"></i>
+            <span>Archivos</span>
+          </a>
+          <ul class="submenu">
+            <li>
+              <a href="{{ route('archivos.create') }}">Crear</a>
+            </li>
+            <li>
+              <a href="{{ route('archivos.show') }}">Ver</a>
+            </li>
+            <li>
+              <a href="{{ route('archivos.buscar') }}">Buscar</a>
+            </li>
+          </ul>
+        </li>
         <li class='sidebar-title'>AREAS</li>
         <li class="sidebar-item has-sub">
           <a href="#" class='sidebar-link'>
