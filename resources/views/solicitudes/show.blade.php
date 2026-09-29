@@ -41,6 +41,29 @@
       <a href="{{ route('solicitudes.create') }}" class="btn btn-primary btn-sm">+ Nueva solicitud</a>
     </div>
     <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-3 col-12">
+          <label for="filtro-area" class="form-label">Área</label>
+          <select class="form-control" id="filtro-area">
+            <option value="">-- Todas las áreas --</option>
+            @foreach($areas as $area)
+              <option value="{{ $area->id }}">{{ $area->nombre_area }}</option>
+            @endforeach
+          </select>
+        </div>
+        <div class="col-md-3 col-12">
+          <label for="filtro-fecha-desde" class="form-label">Desde</label>
+          <input type="date" class="form-control" id="filtro-fecha-desde">
+        </div>
+        <div class="col-md-3 col-12">
+          <label for="filtro-fecha-hasta" class="form-label">Hasta</label>
+          <input type="date" class="form-control" id="filtro-fecha-hasta">
+        </div>
+        <div class="col-md-3 col-12 d-flex align-items-end gap-2">
+          <button class="btn btn-primary w-100" id="btn-filtrar">Filtrar</button>
+          <button class="btn btn-secondary w-100" id="btn-limpiar">Limpiar</button>
+        </div>
+      </div>
       <table class="table table-striped" id="solicitudes-table">
         <thead>
           <tr>

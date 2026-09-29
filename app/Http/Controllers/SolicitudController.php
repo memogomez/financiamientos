@@ -9,6 +9,8 @@ use App\Models\Solicitud;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\SimpleType\Jc;
 use PhpOffice\PhpWord\IOFactory;
@@ -17,7 +19,9 @@ class SolicitudController extends Controller
 {
     public function show()
     {
-        return view('solicitudes.show');
+        $areas = Area::query()->where('estatus', 1)->orderBy('nombre_area')->get();
+
+        return view('solicitudes.show', compact('areas'));
     }
 
     public function paginate(Request $request)
@@ -28,14 +32,19 @@ class SolicitudController extends Controller
 
         $query = DB::table('solicitudes as s')
             ->leftJoin('areas as a', 's.id_area', '=', 'a.id')
+            ->leftJoin('oficios as o', function ($join) {
+                $join->on('s.id', '=', 'o.id_solicitud')
+                    ->where('o.tipo_oficio', '=', 'comprobacion');
+            })
             ->select(
                 's.id',
                 'a.nombre_area',
                 's.solicita',
                 's.dirigido',
                 's.fecha',
-                's.comprobacion'
-            );
+                DB::raw("IF(MAX(o.url) IS NOT NULL AND MAX(o.url) != '', 1, 0) AS comprobacion")
+            )
+            ->groupBy('s.id');
 
         if ($request->has('search') && $request->get('search')['value']) {
             $searchValue = $request->get('search')['value'];
@@ -47,9 +56,22 @@ class SolicitudController extends Controller
             });
         }
 
+        if ($request->has('id_area') && $request->get('id_area')) {
+            $query->where('s.id_area', '=', $request->get('id_area'));
+        }
+
+        if ($request->has('fecha_desde') && $request->get('fecha_desde')) {
+            $query->whereDate('s.fecha', '>=', $request->get('fecha_desde'));
+        }
+
+        if ($request->has('fecha_hasta') && $request->get('fecha_hasta')) {
+            $query->whereDate('s.fecha', '<=', $request->get('fecha_hasta'));
+        }
+
         $query->orderBy('s.id', 'desc');
 
         $total = DB::table('solicitudes')->count();
+        $filteredCount = (clone $query)->count();
         $start  = (int) $request->get('start', 0);
         $length = (int) $request->get('length', 10);
         $solicitudes = $query->offset($start)->limit($length)->get();
@@ -57,7 +79,7 @@ class SolicitudController extends Controller
         return response()->json([
             'draw'            => (int) $request->get('draw'),
             'recordsTotal'    => $total,
-            'recordsFiltered' => $total,
+            'recordsFiltered' => $filteredCount,
             'data'            => $solicitudes,
         ]);
     }
@@ -82,13 +104,14 @@ class SolicitudController extends Controller
                 'dirigido'         => $request->dirigido,
                 'monto_solicitado' => $request->monto_solicitado,
                 'observaciones'    => $request->observaciones,
-                'comprobacion'     => (bool) $request->boolean('comprobacion'),
+                'comprobacion'     => false,
                 'estatus'          => $request->input('estatus', 1),
             ]);
 
             $this->procesarOficio($request, $solicitud->id, null, 'oficio_inicio', 'num_oficio_inicio', 'archivo_oficio_inicio');
-            $this->procesarOficio($request, $solicitud->id, null, 'oficio_oficial_mayor', 'num_oficio_oficial_mayor', 'archivo_oficio_oficial_mayor');
             $this->procesarOficio($request, $solicitud->id, null, 'oficio_fiscal', 'num_oficio_fiscal', 'archivo_oficio_fiscal');
+            $this->procesarOficio($request, $solicitud->id, null, 'oficio_oficial_mayor', 'num_oficio_oficial_mayor', 'archivo_oficio_oficial_mayor');
+            $this->procesarOficio($request, $solicitud->id, null, 'comprobacion', 'num_oficio_comprobacion', 'archivo_oficio_comprobacion');
 
             DB::connection('mysql')->commit();
 
@@ -120,13 +143,13 @@ class SolicitudController extends Controller
             'dirigido'                     => 'required|string|max:255',
             'monto_solicitado'             => 'required|numeric|min:0',
             'observaciones'                => 'nullable|string',
-            'comprobacion'                 => 'nullable|boolean',
             'num_oficio_inicio'            => 'nullable|string|max:100',
-            'archivo_oficio_inicio'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_inicio'        => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
             'num_oficio_oficial_mayor'     => 'nullable|string|max:100',
-            'archivo_oficio_oficial_mayor' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_oficial_mayor' => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
             'num_oficio_fiscal'            => 'nullable|string|max:100',
-            'archivo_oficio_fiscal'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_fiscal'        => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_comprobacion'  => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
         ]);
 
         DB::connection('mysql')->beginTransaction();
@@ -139,7 +162,6 @@ class SolicitudController extends Controller
                 'dirigido'         => $request->dirigido,
                 'monto_solicitado' => $request->monto_solicitado,
                 'observaciones'    => $request->observaciones,
-                'comprobacion'     => (bool) $request->boolean('comprobacion'),
                 'estatus'          => $request->input('estatus', $solicitud->estatus),
             ]);
 
@@ -147,8 +169,9 @@ class SolicitudController extends Controller
             $oficiosPorTipo = $solicitud->oficios->keyBy('tipo_oficio');
 
             $this->procesarOficio($request, $solicitud->id, $oficiosPorTipo->get('oficio_inicio'),        'oficio_inicio',        'num_oficio_inicio',            'archivo_oficio_inicio');
-            $this->procesarOficio($request, $solicitud->id, $oficiosPorTipo->get('oficio_oficial_mayor'), 'oficio_oficial_mayor', 'num_oficio_oficial_mayor',     'archivo_oficio_oficial_mayor');
             $this->procesarOficio($request, $solicitud->id, $oficiosPorTipo->get('oficio_fiscal'),        'oficio_fiscal',        'num_oficio_fiscal',            'archivo_oficio_fiscal');
+            $this->procesarOficio($request, $solicitud->id, $oficiosPorTipo->get('oficio_oficial_mayor'), 'oficio_oficial_mayor', 'num_oficio_oficial_mayor',     'archivo_oficio_oficial_mayor');
+            $this->procesarOficio($request, $solicitud->id, $oficiosPorTipo->get('comprobacion'),         'comprobacion',         'num_oficio_comprobacion',      'archivo_oficio_comprobacion');
 
             DB::connection('mysql')->commit();
 
@@ -353,8 +376,21 @@ class SolicitudController extends Controller
         $numeroOficio = $request->input($campoNumero);
         $rutaArchivo  = null;
 
-        if ($request->hasFile($campoArchivo)) {
-            $rutaArchivo = $request->file($campoArchivo)->store('oficios', 'public');
+        if ($request->hasFile($campoArchivo) && $request->file($campoArchivo) !== null) {
+            try {
+                $file = $request->file($campoArchivo);
+                if ($file && $file->isValid()) {
+                    $nombreArchivo = uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    $directorioDestino = storage_path('app/public/oficios');
+                    if (!is_dir($directorioDestino)) {
+                        mkdir($directorioDestino, 0755, true);
+                    }
+                    $file->move($directorioDestino, $nombreArchivo);
+                    $rutaArchivo = 'storage/oficios/' . $nombreArchivo;
+                }
+            } catch (\Exception $e) {
+                Log::error('Error storing file: ' . $e->getMessage() . ' - Campo: ' . $campoArchivo);
+            }
         }
 
         if ($oficioExistente) {

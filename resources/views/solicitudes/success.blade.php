@@ -23,7 +23,7 @@
             <p class="card-text"><strong>Solicita:</strong> {{ $solicitud->solicita }}</p>
             <p class="card-text"><strong>Dirigido:</strong> {{ $solicitud->dirigido }}</p>
             <p class="card-text"><strong>Monto solicitado:</strong> {{ number_format((float) $solicitud->monto_solicitado, 2, '.', ',') }}</p>
-            <p class="card-text"><strong>Comprobación:</strong> {{ $solicitud->comprobacion ? 'Sí' : 'No' }}</p>
+            <p class="card-text"><strong>Comprobación:</strong> {{ $solicitud->oficios->where('tipo_oficio', 'comprobacion')->where('url', '!=', '')->count() > 0 ? 'Sí' : 'No' }}</p>
             @if($solicitud->observaciones)
               <p class="card-text"><strong>Observaciones:</strong> {{ $solicitud->observaciones }}</p>
             @endif
