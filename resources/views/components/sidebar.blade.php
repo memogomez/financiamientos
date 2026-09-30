@@ -27,7 +27,7 @@
             </li>
           </ul>
         </li>
-        <li class='sidebar-title'>ARCHIVOS</li>
+        {{-- <li class='sidebar-title'>ARCHIVOS</li>
         <li class="sidebar-item has-sub">
           <a href="#" class='sidebar-link'>
             <i data-feather="file-text" width="20"></i>
@@ -44,7 +44,7 @@
               <a href="{{ route('archivos.buscar') }}">Buscar</a>
             </li>
           </ul>
-        </li>
+        </li> --}}
         <li class='sidebar-title'>AREAS</li>
         <li class="sidebar-item has-sub">
           <a href="#" class='sidebar-link'>

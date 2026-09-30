@@ -1,5 +1,5 @@
 $(document).ready(function () {
-  $('#solicitudes-table').DataTable({
+  var table = $('#solicitudes-table').DataTable({
     destroy: true,
     processing: true,
     serverSide: true,
@@ -8,6 +8,11 @@ $(document).ready(function () {
     responsive: true,
     ajax: {
       url: urlSolicitudesPaginate,
+      data: function (d) {
+        d.id_area = $('#filtro-area').val();
+        d.fecha_desde = $('#filtro-fecha-desde').val();
+        d.fecha_hasta = $('#filtro-fecha-hasta').val();
+      },
     },
     columns: [
       { data: 'nombre_area', name: 'nombre_area', width: '20%', searchable: true },
@@ -67,5 +72,16 @@ $(document).ready(function () {
         next: 'Siguiente',
       },
     },
+  });
+
+  $('#btn-filtrar').on('click', function () {
+    table.ajax.reload();
+  });
+
+  $('#btn-limpiar').on('click', function () {
+    $('#filtro-area').val('');
+    $('#filtro-fecha-desde').val('');
+    $('#filtro-fecha-hasta').val('');
+    table.ajax.reload();
   });
 });

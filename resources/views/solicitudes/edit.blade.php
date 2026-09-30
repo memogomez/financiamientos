@@ -127,7 +127,7 @@
                 </div>
               </div>
 
-              {{-- Fila 3: Monto solicitado + Comprobación --}}
+              {{-- Fila 3: Monto solicitado --}}
               <div class="col-md-6 col-12">
                 <div class="form-group">
                   <label for="monto_solicitado">Monto solicitado</label>@if(!$soloOficios)<strong>*</strong>@endif
@@ -136,27 +136,6 @@
                     value="{{ old('monto_solicitado', $solicitud->monto_solicitado) }}"
                     @if($soloOficios) readonly @endif>
                   @error('monto_solicitado')<span class="text-danger">{{ $message }}</span>@enderror
-                </div>
-              </div>
-              <div class="col-md-6 col-12">
-                <div class="form-group">
-                  <label class="d-block">Comprobación</label>
-                  @if($soloOficios)
-                    <input type="hidden" name="comprobacion" value="{{ old('comprobacion', $solicitud->comprobacion) ? '1' : '0' }}">
-                    <div class="form-check form-switch mt-2">
-                      <input class="form-check-input" id="comprobacion" type="checkbox"
-                        @checked(old('comprobacion', $solicitud->comprobacion)) disabled>
-                      <label class="form-check-label" for="comprobacion">Activar / Desactivar</label>
-                    </div>
-                  @else
-                    <input type="hidden" name="comprobacion" value="0">
-                    <div class="form-check form-switch mt-2">
-                      <input class="form-check-input" id="comprobacion" name="comprobacion" type="checkbox" value="1"
-                        @checked(old('comprobacion', $solicitud->comprobacion))>
-                      <label class="form-check-label" for="comprobacion">Activar / Desactivar</label>
-                    </div>
-                  @endif
-                  @error('comprobacion')<span class="text-danger">{{ $message }}</span>@enderror
                 </div>
               </div>
 
@@ -181,21 +160,22 @@
   {{-- ===================== OFICIOS ===================== --}}
   @php
     $tiposOficio = [
-      'oficio_inicio'        => 'Oficio inicio',
-      'oficio_fiscal'        => 'Oficio fiscal',
-      'oficio_oficial_mayor' => 'Oficio oficial mayor',
+      'oficio_inicio'        => ['label' => 'Oficio inicio', 'campo' => 'inicio'],
+      'oficio_fiscal'        => ['label' => 'Oficio fiscal', 'campo' => 'fiscal'],
+      'oficio_oficial_mayor' => ['label' => 'Oficio oficial mayor', 'campo' => 'oficial_mayor'],
+      'comprobacion'         => ['label' => 'Nueva comprobación', 'campo' => 'comprobacion'],
     ];
   @endphp
 
   <section id="oficios-section" class="mt-2">
     <div class="row">
-      @foreach ($tiposOficio as $tipo => $etiqueta)
+      @foreach ($tiposOficio as $tipo => $info)
         @php $oficio = $oficiosPorTipo->get($tipo); @endphp
-        <div class="col-lg-4 col-md-6 col-12 mb-3">
+        <div class="col-lg-3 col-md-6 col-12 mb-3">
           <div class="card h-100 border {{ $oficio ? 'border-success' : 'border-warning' }}">
             <div class="card-header d-flex justify-content-between align-items-center
               {{ $oficio ? 'bg-success text-white' : 'bg-warning text-dark' }}">
-              <span>{{ $etiqueta }}</span>
+              <span>{{ $info['label'] }}</span>
               @if($oficio)
                 <span class="badge bg-white text-success">Registrado</span>
               @else
@@ -203,18 +183,18 @@
               @endif
             </div>
             <div class="card-body">
-              {{-- Número de oficio --}}
+              {{-- Número de oficio / comprobación --}}
               <div class="form-group">
                 <label for="num_{{ $tipo }}">
-                  Número de oficio
+                  {{ $tipo === 'comprobacion' ? 'Número de comprobación' : 'Número de oficio' }}
                   @if($oficio) <small class="text-muted">(actual: {{ $oficio->num_oficio ?: '—' }})</small> @endif
                 </label>
                 <input class="form-control" id="num_{{ $tipo }}"
-                  name="num_oficio_{{ $tipo === 'oficio_inicio' ? 'inicio' : ($tipo === 'oficio_oficial_mayor' ? 'oficial_mayor' : 'fiscal') }}"
+                  name="num_oficio_{{ $info['campo'] }}"
                   type="text" maxlength="100"
-                  value="{{ old('num_oficio_' . ($tipo === 'oficio_inicio' ? 'inicio' : ($tipo === 'oficio_oficial_mayor' ? 'oficial_mayor' : 'fiscal')), $oficio?->num_oficio) }}"
+                  value="{{ old('num_oficio_' . $info['campo'], $oficio?->num_oficio) }}"
                   placeholder="{{ $oficio ? 'Actualizar número' : 'Agregar número' }}">
-                @error('num_oficio_' . ($tipo === 'oficio_inicio' ? 'inicio' : ($tipo === 'oficio_oficial_mayor' ? 'oficial_mayor' : 'fiscal')))
+                @error('num_oficio_' . $info['campo'])
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>
@@ -236,9 +216,9 @@
                   <small class="text-muted">(pdf, jpg, png — máx. 5MB)</small>
                 </label>
                 <input class="form-control" id="archivo_{{ $tipo }}"
-                  name="archivo_oficio_{{ $tipo === 'oficio_inicio' ? 'inicio' : ($tipo === 'oficio_oficial_mayor' ? 'oficial_mayor' : 'fiscal') }}"
+                  name="archivo_oficio_{{ $info['campo'] }}"
                   type="file" accept=".pdf,.jpg,.jpeg,.png">
-                @error('archivo_oficio_' . ($tipo === 'oficio_inicio' ? 'inicio' : ($tipo === 'oficio_oficial_mayor' ? 'oficial_mayor' : 'fiscal')))
+                @error('archivo_oficio_' . $info['campo'])
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>

@@ -20,14 +20,14 @@ class SolicitudRequest extends FormRequest
             'dirigido'                     => 'required|string|max:255',
             'monto_solicitado'             => 'required|numeric|min:0',
             'observaciones'                => 'nullable|string',
-            'comprobacion'                 => 'nullable|boolean',
             'estatus'                      => 'sometimes|integer',
             'num_oficio_inicio'            => 'nullable|string|max:100',
-            'archivo_oficio_inicio'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_inicio'        => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
             'num_oficio_oficial_mayor'     => 'nullable|string|max:100',
-            'archivo_oficio_oficial_mayor' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_oficial_mayor' => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
             'num_oficio_fiscal'            => 'nullable|string|max:100',
-            'archivo_oficio_fiscal'        => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_fiscal'        => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
+            'archivo_oficio_comprobacion'  => 'nullable|file|extensions:pdf,jpg,jpeg,png|max:5120',
         ];
     }
 

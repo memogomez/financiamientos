@@ -49,7 +49,6 @@
             <form action="{{ route('solicitudes.store') }}" method="post" enctype="multipart/form-data">
               @csrf
               <input type="hidden" name="estatus" value="1">
-              <input type="hidden" name="comprobacion" value="0">
               <h4 class="card-title mt-3 mb-3">Datos de la solicitud</h4>
               <p class="text-subtitle text-muted">Los campos con <strong>*</strong> son obligatorios</p>
               <div class="row">
@@ -104,26 +103,13 @@
                   </div>
                 </div>
 
-                {{-- Fila 3: Monto solicitado + Comprobación --}}
+                {{-- Fila 3: Monto solicitado --}}
                 <div class="col-md-6 col-12">
                   <div class="form-group">
                     <label for="monto_solicitado">Monto solicitado</label><strong>*</strong>
                     <input class="form-control" id="monto_solicitado" name="monto_solicitado" type="number"
                       step="0.01" min="0" placeholder="0.00" value="{{ old('monto_solicitado', '0') }}">
                     @error('monto_solicitado')
-                      <span class="text-danger">{{ $message }}</span>
-                    @enderror
-                  </div>
-                </div>
-                <div class="col-md-6 col-12">
-                  <div class="form-group">
-                    <label class="d-block">Comprobación</label>
-                    <div class="form-check form-switch mt-2">
-                      <input class="form-check-input" id="comprobacion" name="comprobacion" type="checkbox" value="1"
-                        @checked(old('comprobacion', 0))>
-                      <label class="form-check-label" for="comprobacion">Activar / Desactivar</label>
-                    </div>
-                    @error('comprobacion')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
@@ -200,6 +186,26 @@
                     <label for="archivo_oficio_oficial_mayor">Archivo oficio oficial mayor</label>
                     <input class="form-control" id="archivo_oficio_oficial_mayor" name="archivo_oficio_oficial_mayor" type="file" accept=".pdf,.jpg,.jpeg,.png">
                     @error('archivo_oficio_oficial_mayor')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="num_oficio_comprobacion">Numero comprobación</label>
+                    <input class="form-control" id="num_oficio_comprobacion" name="num_oficio_comprobacion" type="text" maxlength="100"
+                      value="{{ old('num_oficio_comprobacion') }}">
+                    @error('num_oficio_comprobacion')
+                      <span class="text-danger">{{ $message }}</span>
+                    @enderror
+                  </div>
+                </div>
+                <div class="col-md-6 col-12">
+                  <div class="form-group">
+                    <label for="archivo_oficio_comprobacion">Archivo comprobación</label>
+                    <input class="form-control" id="archivo_oficio_comprobacion" name="archivo_oficio_comprobacion" type="file" accept=".pdf,.jpg,.jpeg,.png">
+                    @error('archivo_oficio_comprobacion')
                       <span class="text-danger">{{ $message }}</span>
                     @enderror
                   </div>
